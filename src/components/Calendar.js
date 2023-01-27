@@ -1,12 +1,43 @@
-export function Calendar() {
-  return (
-    <iframe
-      title="calendar"
-      src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America%2FLos_Angeles&showNav=1&title=Yoga%20Classes%20and%20Events%20in%20Plumas%20County&src=NWIxMjQ4NmY4MTM4NjEyN2I5ZGExZGMxODMwYTc1OGExYzY1OTBkMTEyYjZkNGUxYjk3YWNhNmQwNGM5NmQwZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23E67C73"
-      style={{ borderWidth: 0 }}
-      width="800"
-      height="600"
-      frameborder="0"
-    ></iframe>
-  );
+import React from "react";
+
+import { Calendar as FullCalendar } from "@fullcalendar/core";
+import googleCalendarPlugin from "@fullcalendar/google-calendar";
+import interactionPlugin from "@fullcalendar/interaction";
+import dayGridPlugin from "@fullcalendar/daygrid";
+
+const googleCalendarApiKey = "AIzaSyCzWol4EXLrlxgi1vUrPzOsTkUUiM17Bg4";
+const googleCalendarId =
+  "5b12486f81386n127b9da1dc1830a758a1c6590d112b6d4e1b97aca6d04c96d0f@group.calendar.google.com";
+const googleOAuthClientId =
+  "676890687623-8s3fvm9pg5c67om74rfvekqefaeppasu.apps.googleusercontent.com";
+
+const plugins = [googleCalendarPlugin, interactionPlugin, dayGridPlugin];
+
+export function Calendnpar() {
+  const calendarRef = React.useRef(null);
+
+  // Initalize FullCalendar
+  const [googleCalendar, setGoogleCalendar] = React.useState(null);
+  React.useEffect(() => {
+    if (calendarRef.current === null || googleCalendar !== null) {
+      return;
+    }
+
+    const calendar = new FullCalendar(calendarRef.current, {
+      plugins,
+      googleCalendarApiKey,
+      initialView: "dayGridMonth",
+      events: {
+        googleCalendarId,
+        className: "gcal-event", // an option!
+      },
+    });
+
+    calendar.render();
+
+    setGoogleCalendar(calendar);
+  }, [calendarRef, googleCalendar]);
+
+  console.log("googleCalendar", googleCalendar);
+  return <div ref={calendarRef}></div>;
 }
