@@ -13,7 +13,7 @@ const googleOAuthClientId =
 
 const plugins = [googleCalendarPlugin, interactionPlugin, dayGridPlugin];
 
-export function Calendnpar() {
+export function Calendar() {
   const calendarRef = React.useRef(null);
 
   // Initalize FullCalendar
