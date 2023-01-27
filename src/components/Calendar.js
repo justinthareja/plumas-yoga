@@ -7,6 +7,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 
+import { useIsMobile } from "../hooks";
+
 const googleCalendarApiKey = "AIzaSyCzWol4EXLrlxgi1vUrPzOsTkUUiM17Bg4";
 const googleCalendarId =
   "5b12486f81386127b9da1dc1830a758a1c6590d112b6d4e1b97aca6d04c96d0f@group.calendar.google.com";
@@ -21,15 +23,16 @@ const plugins = [
 
 export function Calendar() {
   const calendarRef = React.useRef(null);
-  const [googleCalendar, setGoogleCalendar] = React.useState(null);
+  const [calendar, setCalendar] = React.useState(null);
+  const isMobile = useIsMobile();
 
   // Initalize FullCalendar
   React.useEffect(() => {
-    if (calendarRef.current === null || googleCalendar !== null) {
+    if (calendarRef.current === null || calendar !== null) {
       return;
     }
 
-    const calendar = new FullCalendar(calendarRef.current, {
+    const fullCalendar = new FullCalendar(calendarRef.current, {
       plugins,
       googleCalendarApiKey,
       events: {
@@ -37,23 +40,60 @@ export function Calendar() {
         className: "gcal-event", // an option!
       },
       eventClick: handleEventClick,
-      initialView: "dayGridMonth",
-      headerToolbar: {
-        left: "today prev,next",
-        center: "title",
-        right: "timeGridWeek,dayGridMonth,listWeek",
-      },
+
+      initialView: isMobile ? "listMonth" : "dayGridMonth",
+      headerToolbar: isMobile
+        ? {
+            left: "prev,next",
+            center: "",
+            right: "title",
+          }
+        : {
+            left: "today prev,next",
+            center: "title",
+            right: "timeGridWeek,dayGridMonth,listWeek",
+          },
+      height: "auto",
       buttonText: {
         list: "agenda",
       },
     });
 
-    calendar.render();
+    fullCalendar.render();
 
-    setGoogleCalendar(calendar);
-  }, [calendarRef, googleCalendar]);
+    setCalendar(fullCalendar);
+
+    // import overrides AFTER fullcalendar's stylesheet is loaded to maintain precedence
+    require("./Calendar.css");
+  }, [calendarRef, calendar, isMobile]);
+
+  // Change view when screen size updates
+  React.useEffect(() => {
+    if (calendar === null) {
+      return;
+    }
+
+    if (isMobile && calendar.view.type !== "listMonth") {
+      calendar.setOption("headerToolbar", {
+        left: "prev,next",
+        center: "",
+        right: "title",
+      });
+      calendar.changeView("listMonth");
+    }
+
+    if (!isMobile && calendar.view.type !== "dayGridMonth") {
+      calendar.setOption("headerToolbar", {
+        left: "today prev,next",
+        center: "title",
+        right: "timeGridWeek,dayGridMonth,listWeek",
+      });
+      calendar.changeView("dayGridMonth");
+    }
+  }, [isMobile, calendar]);
 
   function handleEventClick(info) {
+    // TODO: Show description popup
     info.jsEvent.preventDefault(); // don't let the browser navigate
 
     if (info.event.url) {
