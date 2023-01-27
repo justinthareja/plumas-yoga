@@ -1,0 +1,8 @@
+/* 
+  Overrides for fullcalendar 
+  see: https://fullcalendar.io/docs/css-customization
+*/
+
+.fc .fc-toolbar-title {
+  font-size: 1.5em;
+}

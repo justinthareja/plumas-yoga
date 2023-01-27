@@ -1,12 +1,105 @@
+import React from "react";
+
+import { Calendar as FullCalendar } from "@fullcalendar/core";
+import googleCalendarPlugin from "@fullcalendar/google-calendar";
+import interactionPlugin from "@fullcalendar/interaction";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
+
+import { useIsMobile } from "../hooks";
+
+const googleCalendarApiKey = "AIzaSyCzWol4EXLrlxgi1vUrPzOsTkUUiM17Bg4";
+const googleCalendarId =
+  "5b12486f81386127b9da1dc1830a758a1c6590d112b6d4e1b97aca6d04c96d0f@group.calendar.google.com";
+
+const plugins = [
+  googleCalendarPlugin,
+  interactionPlugin,
+  dayGridPlugin,
+  timeGridPlugin,
+  listPlugin,
+];
+
 export function Calendar() {
-  return (
-    <iframe
-      title="calendar"
-      src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America%2FLos_Angeles&showNav=1&title=Yoga%20Classes%20and%20Events%20in%20Plumas%20County&src=NWIxMjQ4NmY4MTM4NjEyN2I5ZGExZGMxODMwYTc1OGExYzY1OTBkMTEyYjZkNGUxYjk3YWNhNmQwNGM5NmQwZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23E67C73"
-      style={{ borderWidth: 0 }}
-      width="800"
-      height="600"
-      frameborder="0"
-    ></iframe>
-  );
+  const calendarRef = React.useRef(null);
+  const [calendar, setCalendar] = React.useState(null);
+  const isMobile = useIsMobile();
+
+  // Initalize FullCalendar
+  React.useEffect(() => {
+    if (calendarRef.current === null || calendar !== null) {
+      return;
+    }
+
+    const fullCalendar = new FullCalendar(calendarRef.current, {
+      plugins,
+      googleCalendarApiKey,
+      events: {
+        googleCalendarId,
+        className: "gcal-event", // an option!
+      },
+      eventClick: handleEventClick,
+
+      initialView: isMobile ? "listMonth" : "dayGridMonth",
+      headerToolbar: isMobile
+        ? {
+            left: "prev,next",
+            center: "",
+            right: "title",
+          }
+        : {
+            left: "today prev,next",
+            center: "title",
+            right: "timeGridWeek,dayGridMonth,listWeek",
+          },
+      height: "auto",
+      buttonText: {
+        list: "agenda",
+      },
+    });
+
+    fullCalendar.render();
+
+    setCalendar(fullCalendar);
+
+    // import overrides AFTER fullcalendar's stylesheet is loaded to maintain precedence
+    require("./Calendar.css");
+  }, [calendarRef, calendar, isMobile]);
+
+  // Change view when screen size updates
+  React.useEffect(() => {
+    if (calendar === null) {
+      return;
+    }
+
+    if (isMobile && calendar.view.type !== "listMonth") {
+      calendar.setOption("headerToolbar", {
+        left: "prev,next",
+        center: "",
+        right: "title",
+      });
+      calendar.changeView("listMonth");
+    }
+
+    if (!isMobile && calendar.view.type !== "dayGridMonth") {
+      calendar.setOption("headerToolbar", {
+        left: "today prev,next",
+        center: "title",
+        right: "timeGridWeek,dayGridMonth,listWeek",
+      });
+      calendar.changeView("dayGridMonth");
+    }
+  }, [isMobile, calendar]);
+
+  function handleEventClick(info) {
+    // TODO: Show description popup
+    info.jsEvent.preventDefault(); // don't let the browser navigate
+
+    if (info.event.url) {
+      window.open(info.event.url);
+    }
+  }
+
+  return <div ref={calendarRef}></div>;
 }
