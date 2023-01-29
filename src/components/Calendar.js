@@ -28,7 +28,7 @@ export function Calendar() {
 
   // Initalize FullCalendar
   React.useEffect(() => {
-    if (calendarRef.current === null || calendar !== null) {
+    if (calendar !== null) {
       return;
     }
 
@@ -65,7 +65,7 @@ export function Calendar() {
 
     // import overrides AFTER fullcalendar's stylesheet is loaded to maintain precedence
     require("./Calendar.css");
-  }, [calendarRef, calendar, isMobile]);
+  }, [calendar, isMobile]);
 
   // Change view when screen size updates
   React.useEffect(() => {
