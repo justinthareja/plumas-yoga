@@ -9,9 +9,8 @@ import listPlugin from "@fullcalendar/list";
 
 import { useIsMobile } from "../hooks";
 
-const googleCalendarApiKey = "AIzaSyCzWol4EXLrlxgi1vUrPzOsTkUUiM17Bg4";
-const googleCalendarId =
-  "5b12486f81386127b9da1dc1830a758a1c6590d112b6d4e1b97aca6d04c96d0f@group.calendar.google.com";
+const googleCalendarApiKey = process.env.REACT_APP_GOOGLE_CALENDAR_API_KEY;
+const googleCalendarId = process.env.REACT_APP_GOOGLE_CALENDAR_ID;
 
 const plugins = [
   googleCalendarPlugin,
