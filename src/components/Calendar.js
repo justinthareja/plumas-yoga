@@ -9,8 +9,8 @@ import listPlugin from "@fullcalendar/list";
 
 import { useIsMobile } from "../hooks";
 
-const googleCalendarApiKey = process.env.REACT_APP_GOOGLE_CALENDAR_API_KEY;
-const googleCalendarId = process.env.REACT_APP_GOOGLE_CALENDAR_ID;
+const googleCalendarApiKey = process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY;
+const googleCalendarId = process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID;
 
 const plugins = [
   googleCalendarPlugin,
@@ -61,9 +61,6 @@ export function Calendar() {
     fullCalendar.render();
 
     setCalendar(fullCalendar);
-
-    // import overrides AFTER fullcalendar's stylesheet is loaded to maintain precedence
-    require("./Calendar.css");
   }, [calendar, isMobile]);
 
   // Change view when screen size updates
